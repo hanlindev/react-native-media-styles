@@ -1,0 +1,16 @@
+diff --git a/android/src/main/java/expo/modules/router/ExpoRouterModule.kt b/android/src/main/java/expo/modules/router/ExpoRouterModule.kt
+deleted file mode 100644
+index 369cd65886415cb894b858e38604dc59b5c6ba95..0000000000000000000000000000000000000000
+diff --git a/build/views/Toast.js b/build/views/Toast.js
+index 1412c861393f3006cbb5d7bcd7fda1eb64bcdcb8..4c7560ed025e00a816929a6a19ffe11577b686b2 100644
+--- a/build/views/Toast.js
++++ b/build/views/Toast.js
+@@ -24,7 +24,7 @@ function useFadeIn() {
+         react_native_1.Animated.timing(value, {
+             toValue: 1,
+             duration: 200,
+-            useNativeDriver: true,
++            useNativeDriver: react_native_1.Platform.OS !== 'web',
+         }).start();
+     }, []);
+     return value;

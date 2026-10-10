@@ -9,5 +9,5 @@
     "noEmit": true,
     "customConditions": ["react-native"]
   },
-  "include": ["src"]
+  "include": ["packages/core/src"]
 }

@@ -1,0 +1,64 @@
+diff --git a/build/cjs/vendor/http.js b/build/cjs/vendor/http.js
+index 8e26daf27a9078b1e87c944e50443b77efd3b0db..6abca94d13e54de5e318157d45ace9929748aeb7 100644
+--- a/build/cjs/vendor/http.js
++++ b/build/cjs/vendor/http.js
+@@ -25,6 +25,9 @@ function createRequestHandler(params, setup) {
+             return await run(onRequest, request);
+         }
+         catch (error) {
++            if (request.signal.aborted && error === request.signal.reason) {
++                throw error;
++            }
+             const handleRouteError = setup?.handleRouteError;
+             if (handleRouteError && error != null && typeof error === 'object') {
+                 try {
+@@ -41,12 +44,16 @@ function createRequestHandler(params, setup) {
+         if (!req?.url || !req.method) {
+             return next();
+         }
++        let request;
+         try {
+-            const request = convertRequest(req, res);
++            request = convertRequest(req, res);
+             const response = await requestHandler(request);
+             await respond(res, response, { signal: request.signal });
+         }
+         catch (error) {
++            if (request?.signal.aborted && error === request.signal.reason) {
++                return;
++            }
+             // http doesn't support async functions, so we have to pass along the
+             // error manually using next().
+             next(error);
+diff --git a/build/mjs/vendor/http.js b/build/mjs/vendor/http.js
+index 53a1f2091978a1e06adb0ee385de2067c554b2db..b9aec391d73fe49bcda3963a6021d291d3199c7e 100644
+--- a/build/mjs/vendor/http.js
++++ b/build/mjs/vendor/http.js
+@@ -18,6 +18,9 @@ export function createRequestHandler(params, setup) {
+             return await run(onRequest, request);
+         }
+         catch (error) {
++            if (request.signal.aborted && error === request.signal.reason) {
++                throw error;
++            }
+             const handleRouteError = setup?.handleRouteError;
+             if (handleRouteError && error != null && typeof error === 'object') {
+                 try {
+@@ -34,12 +37,16 @@ export function createRequestHandler(params, setup) {
+         if (!req?.url || !req.method) {
+             return next();
+         }
++        let request;
+         try {
+-            const request = convertRequest(req, res);
++            request = convertRequest(req, res);
+             const response = await requestHandler(request);
+             await respond(res, response, { signal: request.signal });
+         }
+         catch (error) {
++            if (request?.signal.aborted && error === request.signal.reason) {
++                return;
++            }
+             // http doesn't support async functions, so we have to pass along the
+             // error manually using next().
+             next(error);

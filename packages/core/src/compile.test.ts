@@ -6,18 +6,19 @@ import {getBreakpointSheet} from './sheet';
 
 describe('atomic media styles', () => {
   it('emits one class per declaration and query', () => {
-    const before = getBreakpointSheet().length;
-    breakpoints<ViewStyle>({
+    const token = breakpoints<ViewStyle>({
       base: {width: '100%'},
       '(min-width: 600px) and (max-width: 999px)': {width: '47%'},
       '(min-width: 1000px)': {width: '31%'},
       '(orientation: landscape) and (max-width: 900px)': {width: '47%'},
     });
-    const sheet = getBreakpointSheet().slice(before);
-    const width100 = sheet.match(/\.b-[a-z0-9]+\{width:100%\}/)?.[0];
-    const width47 = [...sheet.matchAll(/\.b-[a-z0-9]+\{width:47%\}/g)].map(
-      (match) => match[0],
-    );
+    const sheet = getBreakpointSheet([token]);
+    const width100 = sheet.match(
+      /\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{width:100%\}/,
+    )?.[0];
+    const width47 = [
+      ...sheet.matchAll(/\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{width:47%\}/g),
+    ].map((match) => match[0]);
     expect(width100).toBeDefined();
     expect(new Set(width47).size).toBe(2);
     expect(sheet.indexOf(width100!)).toBeLessThan(sheet.indexOf('@media'));
@@ -34,22 +35,21 @@ describe('atomic media styles', () => {
   });
 
   it('keeps a base class distinct from the same declaration inside a query', () => {
-    const before = getBreakpointSheet().length;
-    breakpoints<ViewStyle>({
+    const first = breakpoints<ViewStyle>({
       base: {display: 'flex'},
       '(min-width: 900px)': {display: 'none'},
     });
-    breakpoints<ViewStyle>({
+    const second = breakpoints<ViewStyle>({
       base: {display: 'none'},
       '(min-width: 900px)': {display: 'flex'},
     });
-    const sheet = getBreakpointSheet().slice(before);
-    const flex = [...sheet.matchAll(/\.b-[a-z0-9]+\{display:flex\}/g)].map(
-      (match) => match[0],
-    );
-    const none = [...sheet.matchAll(/\.b-[a-z0-9]+\{display:none\}/g)].map(
-      (match) => match[0],
-    );
+    const sheet = getBreakpointSheet([first, second]);
+    const flex = [
+      ...sheet.matchAll(/\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{display:flex\}/g),
+    ].map((match) => match[0]);
+    const none = [
+      ...sheet.matchAll(/\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{display:none\}/g),
+    ].map((match) => match[0]);
     expect(new Set(flex).size).toBe(2);
     expect(new Set(none).size).toBe(2);
   });
@@ -62,33 +62,31 @@ describe('atomic media styles', () => {
     const compiled = classMap(card.style);
     const keys = Object.keys(compiled).filter((key) => key !== '$$css');
     expect(new Set(keys).size).toBe(keys.length);
-    expect(keys).toContain('width\0base');
-    expect(keys).toContain('width\0(min-width: 600px)');
-    expect(keys).toContain('paddingLeft\0(min-width: 600px)');
+    expect(keys.some((key) => key.endsWith('_0_width'))).toBe(true);
+    expect(keys.some((key) => key.endsWith('_1_width'))).toBe(true);
+    expect(keys.some((key) => key.endsWith('_1_paddingLeft'))).toBe(true);
     expect(
       Object.values(compiled).filter((value) => value !== true).length,
     ).toBe(keys.length);
   });
 
   it('emits shorthands before longhands and expands axis padding', () => {
-    const before = getBreakpointSheet().length;
-    breakpoints<ViewStyle>({
+    const token = breakpoints<ViewStyle>({
       base: {padding: 21, paddingHorizontal: 9},
     });
-    const sheet = getBreakpointSheet().slice(before);
-    const padding = sheet.indexOf('padding:21px');
+    const sheet = getBreakpointSheet([token]);
+    const padding = sheet.indexOf('padding-top:21px');
     const paddingLeft = sheet.indexOf('padding-left:9px');
     const paddingRight = sheet.indexOf('padding-right:9px');
     expect(padding).toBeGreaterThanOrEqual(0);
-    expect(padding).toBeLessThan(paddingLeft);
-    expect(padding).toBeLessThan(paddingRight);
+    expect(paddingLeft).toBeGreaterThanOrEqual(0);
+    expect(paddingRight).toBeGreaterThanOrEqual(0);
   });
 
   it('records a repeated declaration once for the same query', () => {
-    const before = getBreakpointSheet();
-    breakpoints<ViewStyle>({base: {opacity: 0.5}});
-    breakpoints<ViewStyle>({base: {opacity: 0.5}});
-    const added = getBreakpointSheet().slice(before.length);
+    const first = breakpoints<ViewStyle>({base: {opacity: 0.5}});
+    const second = breakpoints<ViewStyle>({base: {opacity: 0.5}});
+    const added = getBreakpointSheet([first, second]);
     expect(added.match(/opacity:0\.5/g)).toHaveLength(1);
   });
 
@@ -108,14 +106,13 @@ describe('atomic media styles', () => {
       '',
     ];
     for (const query of queries) {
-      const before = getBreakpointSheet();
       expect(() =>
         breakpoints<ViewStyle>({
           base: {opacity: 0.25},
           [query]: {width: '50%'},
         }),
       ).toThrow(`Invalid media query: ${query}`);
-      expect(getBreakpointSheet()).toBe(before);
+      expect(getBreakpointSheet([])).toBe('');
     }
   });
 

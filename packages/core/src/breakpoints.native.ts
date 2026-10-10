@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {Appearance, useWindowDimensions} from 'react-native';
 
 import {breakpointEntries, mergeBreakpointStyles} from './merge';
+import {useComposedToken} from './composition';
 
 import type {StyleProp} from 'react-native';
 import type {
@@ -9,12 +10,26 @@ import type {
   BreakpointToken,
   ComponentStyle,
   MediaStyle,
+  BreakpointStyleInput,
+  ComposedBreakpointStyle,
 } from './types';
 
 export function breakpoints<T extends MediaStyle = never>(
   styles: BreakpointMap<NoInfer<T>>,
-): BreakpointToken<T> {
-  return {entries: breakpointEntries(styles), style: undefined};
+): BreakpointToken<T>;
+export function breakpoints(
+  styles: BreakpointMap<MediaStyle>,
+): BreakpointToken<MediaStyle> {
+  return Object.freeze({entries: breakpointEntries(styles), style: undefined});
+}
+
+export function useBreakpointStyles<T extends MediaStyle>(
+  tokens: readonly BreakpointStyleInput<T>[],
+): ComposedBreakpointStyle<T> {
+  const token = useComposedToken(tokens, (entries) =>
+    Object.freeze({entries, style: undefined}),
+  );
+  return {token, style: useBreakpointStyle(token)};
 }
 
 export function useBreakpointStyle<T extends MediaStyle>(

@@ -1,0 +1,29 @@
+diff --git a/build/src/start/server/getStaticRenderFunctions.js b/build/src/start/server/getStaticRenderFunctions.js
+index 356ec7df6b3582d700dacd3bd0b57157f9dba1cb..8615870ae861f94c949cb28dee1fbb23496583d1 100644
+--- a/build/src/start/server/getStaticRenderFunctions.js
++++ b/build/src/start/server/getStaticRenderFunctions.js
+@@ -127,6 +127,10 @@ function evalMetroAndWrapFunctions(projectRoot, script, filename, sourceMap, isE
+             try {
+                 return await fn.apply(this, props);
+             } catch (error) {
++                const request = props[1]?.request;
++                if (request?.signal.aborted && error === request.signal.reason) {
++                    throw error;
++                }
+                 await (0, _metroErrorInterface.logMetroError)(projectRoot, {
+                     error
+                 });
+diff --git a/build/src/start/server/metro/createServerRouteMiddleware.js b/build/src/start/server/metro/createServerRouteMiddleware.js
+index b4d5f1d6a448819362a5947462de5a0c1035e1ed..ce760f448c071e61e48d23f8fa923ee8810acc75 100644
+--- a/build/src/start/server/metro/createServerRouteMiddleware.js
++++ b/build/src/start/server/metro/createServerRouteMiddleware.js
+@@ -111,6 +111,9 @@ function createRouteHandlerMiddleware(projectRoot, options) {
+                 const { content } = await options.getStaticPageAsync(request.url, route, isSSREnabled ? new (_private()).ImmutableRequest(request) : undefined);
+                 return content;
+             } catch (error) {
++                if (request.signal.aborted && error === request.signal.reason) {
++                    throw error;
++                }
+                 // Forward the Metro server response as-is. It won't be pretty, but at least it will be accurate.
+                 try {
+                     return new Response(await (0, _metroErrorInterface.getErrorOverlayHtmlAsync)({

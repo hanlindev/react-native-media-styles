@@ -49,19 +49,28 @@ describe('native media matching', () => {
     });
     expect(mergeBreakpointStyles(entries, env)).toEqual({
       width: '47%',
-      padding: 16,
+      paddingTop: 16,
+      paddingBottom: 16,
+      paddingLeft: 16,
+      paddingRight: 16,
     });
     expect(
       mergeBreakpointStyles(entries, {...env, width: 390, height: 800}),
     ).toEqual({
       width: '100%',
-      padding: 16,
+      paddingTop: 16,
+      paddingBottom: 16,
+      paddingLeft: 16,
+      paddingRight: 16,
     });
     expect(
       mergeBreakpointStyles(entries, {...env, width: 1200, height: 800}),
     ).toEqual({
       width: '31%',
-      padding: 16,
+      paddingTop: 16,
+      paddingBottom: 16,
+      paddingLeft: 16,
+      paddingRight: 16,
     });
   });
 
@@ -72,8 +81,12 @@ describe('native media matching', () => {
       }),
       env,
     );
-    expect(merged).toEqual({padding: 16, paddingLeft: 8});
-    expect(Object.keys(merged ?? {})).toEqual(['padding', 'paddingLeft']);
+    expect(merged).toEqual({
+      paddingTop: 16,
+      paddingBottom: 16,
+      paddingLeft: 8,
+      paddingRight: 16,
+    });
   });
 
   it('keeps an earlier value when a later query sets that property to undefined', () => {
@@ -83,8 +96,10 @@ describe('native media matching', () => {
     });
     expect(mergeBreakpointStyles(entries, env)).toEqual({
       width: '100%',
-      padding: 16,
+      paddingTop: 16,
+      paddingBottom: 16,
       paddingLeft: 8,
+      paddingRight: 16,
     });
   });
 });

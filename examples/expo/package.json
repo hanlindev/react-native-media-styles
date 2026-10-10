@@ -1,0 +1,39 @@
+{
+  "name": "media-styles-expo-demo",
+  "version": "0.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start:ssr": "node scripts/expo.mjs server start --web --port 8081",
+    "start:spa": "node scripts/expo.mjs single start --web --port 8082",
+    "build:ssr": "node scripts/expo.mjs server export --platform web --output-dir dist-server",
+    "build:spa": "node scripts/expo.mjs single export --platform web --output-dir dist-single",
+    "build:static": "node scripts/expo.mjs static export --platform web --output-dir dist-static",
+    "serve:ssr": "node scripts/expo.mjs server serve dist-server --port 8081",
+    "serve:spa": "node scripts/expo.mjs single serve dist-single --port 8082",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:patches": "node --test scripts/dependency-patches.test.mjs",
+    "test:dev": "node scripts/verify-development.mjs"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~57.0.16",
+    "@react-native-media-styles/core": "workspace:*",
+    "expo": "~57.0.27",
+    "expo-constants": "~57.0.21",
+    "expo-linking": "~57.0.12",
+    "expo-router": "~57.0.25",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-web": "~0.21.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/react": "~19.3.0",
+    "typescript": "~6.0.3"
+  }
+}

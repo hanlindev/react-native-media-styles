@@ -1,3 +1,8 @@
 node_modules
 dist
 *.tsbuildinfo
+.expo/
+examples/expo/dist-*/
+*.tgz
+examples/expo/test-results/
+examples/expo/playwright-report/

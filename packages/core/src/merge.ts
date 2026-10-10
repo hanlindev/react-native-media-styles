@@ -1,5 +1,6 @@
 import {assertValidMediaQuery, queryMatches} from './match';
 import {orderedStyleEntries} from './order';
+import {normalizeStyle} from './normalize';
 
 import type {BreakpointEntry, MediaEnvironment, MediaStyle} from './types';
 
@@ -24,15 +25,18 @@ function definedStyle(style: MediaStyle): MediaStyle {
 export function breakpointEntries<T>(styles: {
   [query: string]: T | undefined;
   base?: T;
-}): BreakpointEntry<T>[] {
+}): readonly BreakpointEntry<T>[] {
   const entries: BreakpointEntry<T>[] = [];
-  if (styles.base != null) entries.push({query: null, style: styles.base});
+  if (styles.base != null)
+    entries.push(
+      Object.freeze({query: null, style: normalizeStyle(styles.base)}),
+    );
   for (const query of Object.keys(styles)) {
     if (query === 'base') continue;
     const style = styles[query];
     if (style == null) continue;
     assertValidMediaQuery(query);
-    entries.push({query, style});
+    entries.push(Object.freeze({query, style: normalizeStyle(style)}));
   }
-  return entries;
+  return Object.freeze(entries);
 }
