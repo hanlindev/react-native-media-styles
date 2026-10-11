@@ -1,14 +1,14 @@
 import {StyleSheet, Text, View, type ViewStyle} from 'react-native';
 import {
-  BreakpointStyles,
   breakpoints,
-  useBreakpointStyle,
+  useBreakpointStyles,
 } from '@react-native-media-styles/core';
 
 const card = breakpoints<ViewStyle>({
   base: {padding: 24, gap: 16},
   '(min-width: 800px)': {flex: 1, padding: 32},
 });
+const compact = breakpoints<ViewStyle>({base: {gap: 12}});
 
 export function ResponsiveCard({
   number,
@@ -19,18 +19,13 @@ export function ResponsiveCard({
   title: string;
   description: string;
 }) {
+  const {style} = useBreakpointStyles([card, number === '02' && compact]);
   return (
-    <>
-      <BreakpointStyles tokens={[card]} />
-      <View
-        testID={`responsive-card-${number}`}
-        style={[styles.card, useBreakpointStyle(card)]}
-      >
-        <Text style={styles.number}>{number} / RESPONSIVE</Text>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.description}>{description}</Text>
-      </View>
-    </>
+    <View testID={`responsive-card-${number}`} style={[styles.card, style]}>
+      <Text style={styles.number}>{number} / RESPONSIVE</Text>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.description}>{description}</Text>
+    </View>
   );
 }
 

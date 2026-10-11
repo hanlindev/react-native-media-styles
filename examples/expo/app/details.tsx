@@ -6,11 +6,8 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
-import {
-  BreakpointStyles,
-  breakpoints,
-  useBreakpointStyle,
-} from '@react-native-media-styles/core';
+import {breakpoints, useBreakpointStyle} from '@react-native-media-styles/core';
+import {Screen} from '../components/Screen';
 
 const title = breakpoints<TextStyle>({
   base: {fontSize: 38, lineHeight: 44},
@@ -23,8 +20,7 @@ const detail = breakpoints<ViewStyle>({
 
 export default function Details() {
   return (
-    <>
-      <BreakpointStyles tokens={[title, detail]} />
+    <Screen>
       <View style={styles.intro}>
         <Text style={[styles.title, useBreakpointStyle(title)]}>
           A different route. Its own styles.
@@ -46,11 +42,11 @@ export default function Details() {
           needs to import them. The companion renders the stylesheet resource
           next to the component that uses it.
         </Text>
-        <Link href="/" style={styles.link}>
+        <Link href="/" dismissTo style={styles.link}>
           ← Back to overview
         </Link>
       </View>
-    </>
+    </Screen>
   );
 }
 

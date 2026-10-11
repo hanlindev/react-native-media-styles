@@ -22,10 +22,10 @@ for (const scenario of ['cancel', 'error', 'error after cancel']) {
     });
     const res = Object.assign(new EventEmitter(), {writableEnded: false});
     const failure = new Error('Actual route failure');
-    const routeErrors = [];
-    const nextErrors = [];
-    let entered;
-    const ready = new Promise((resolve) => {
+    const routeErrors: unknown[] = [];
+    const nextErrors: unknown[] = [];
+    let entered = () => {};
+    const ready = new Promise<void>((resolve) => {
       entered = resolve;
     });
     const handler = createRequestHandler(
@@ -38,7 +38,7 @@ for (const scenario of ['cancel', 'error', 'error after cancel']) {
           apiRoutes: [],
           notFoundRoutes: [],
         }),
-        getHtml: async (request) => {
+        getHtml: async (request: Request) => {
           entered();
           if (scenario === 'error') throw failure;
           return new Promise((resolve, reject) => {
@@ -50,13 +50,15 @@ for (const scenario of ['cancel', 'error', 'error after cancel']) {
             );
           });
         },
-        handleRouteError: async (error) => {
+        handleRouteError: async (error: unknown) => {
           routeErrors.push(error);
           throw error;
         },
       },
     );
-    const completion = handler(req, res, (error) => nextErrors.push(error));
+    const completion = handler(req, res, (error: unknown) =>
+      nextErrors.push(error),
+    );
     await ready;
     if (scenario !== 'error') res.emit('close');
     await completion;

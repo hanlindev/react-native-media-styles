@@ -7,12 +7,13 @@ export default defineConfig({
   use: {browserName: 'chromium', headless: true},
   webServer: [
     {
-      command: 'node scripts/expo.mjs server serve dist-server --port 8091',
-      url: 'http://localhost:8091/details',
+      command: 'node scripts/expo.mts server serve dist-server --port 8091',
+      // The API healthcheck does not render a page or warm its RNW styles.
+      url: 'http://localhost:8091/health',
       reuseExistingServer: false,
     },
     {
-      command: 'node scripts/expo.mjs single serve dist-single --port 8092',
+      command: 'node scripts/expo.mts single serve dist-single --port 8092',
       url: 'http://localhost:8092',
       reuseExistingServer: false,
     },

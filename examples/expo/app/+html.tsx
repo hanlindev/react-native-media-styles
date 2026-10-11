@@ -1,4 +1,4 @@
-import {useServerDocumentContext} from 'expo-router/html';
+import {ScrollViewStyleReset, useServerDocumentContext} from 'expo-router/html';
 import type {ReactNode} from 'react';
 
 export default function Html({children}: {children: ReactNode}) {
@@ -10,6 +10,7 @@ export default function Html({children}: {children: ReactNode}) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Media styles · Expo Router</title>
+        <ScrollViewStyleReset />
         {headNodes}
       </head>
       <body {...bodyAttributes}>

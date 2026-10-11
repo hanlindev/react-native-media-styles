@@ -1,0 +1,41 @@
+{
+  "name": "@react-native-media-styles/metro",
+  "version": "0.1.0",
+  "description": "Metro adapter for streaming React Native Web stylesheet delivery.",
+  "license": "MIT",
+  "files": [
+    "src",
+    "!src/**/*.test.ts",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/metro.d.cts",
+      "default": "./dist/metro.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "pnpm build",
+    "prepack": "pnpm build",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.build.json --noEmit",
+    "test": "pnpm build && vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.4",
+    "@types/react": "~19.3.0",
+    "react": "19.3.0",
+    "react-native-web": "^0.21.4",
+    "typescript": "~6.0.3",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-native-web": ">=0.21 <0.22"
+  }
+}

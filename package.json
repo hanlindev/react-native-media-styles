@@ -3,18 +3,23 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "test": "pnpm --filter @react-native-media-styles/core test",
-    "typecheck": "pnpm --filter @react-native-media-styles/core typecheck",
+    "test": "pnpm --filter \"@react-native-media-styles/*\" test && node --test examples/expo/scripts/android.test.mts examples/expo/scripts/dependency-patches.test.mts",
+    "typecheck": "tsc -p scripts/tsconfig.json && pnpm --filter \"@react-native-media-styles/*\" typecheck && pnpm --dir examples/expo typecheck",
     "lint": "oxlint",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "demo:ssr": "pnpm --dir examples/expo start:ssr",
     "demo:spa": "pnpm --dir examples/expo start:spa",
-    "test:package": "node scripts/check-package.mjs"
+    "test:package": "pnpm --filter @react-native-media-styles/metro build && pnpm --filter @react-native-media-styles/babel-plugin build && node scripts/check-package.mts"
   },
   "devDependencies": {
+    "@types/node": "26.6.4",
     "oxfmt": "^0.72.0",
-    "oxlint": "^1.87.0"
+    "oxlint": "^1.87.0",
+    "typescript": "~6.0.3"
+  },
+  "engines": {
+    "node": ">=24"
   },
   "packageManager": "pnpm@12.9.1"
 }

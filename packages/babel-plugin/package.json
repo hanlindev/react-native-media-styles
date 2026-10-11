@@ -1,0 +1,37 @@
+{
+  "name": "@react-native-media-styles/babel-plugin",
+  "version": "0.1.0",
+  "description": "Automatic React stylesheet companions for responsive style hooks.",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "dist/index.cjs",
+  "types": "dist/index.d.cts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit -p tsconfig.check.json",
+    "prepare": "pnpm build",
+    "prepack": "pnpm build",
+    "test": "pnpm build && node --test index.test.mts"
+  },
+  "dependencies": {
+    "@babel/types": "^7.28.0",
+    "@types/babel__core": "^7.20.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.27.1",
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
+    "@types/node": "26.6.4",
+    "typescript": "~6.0.3"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.0.0"
+  }
+}

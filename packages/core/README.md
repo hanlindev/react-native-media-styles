@@ -101,11 +101,15 @@ const card = breakpoints<ViewStyle>({base: spacing});
 
 ## Web stylesheet
 
+The optional [Babel plugin](../babel-plugin/README.md) inserts companions automatically for components that call the breakpoint hooks directly. The Expo demo uses this approach. Without it, render companions explicitly as shown below.
+
+For Expo Router streaming SSR, wrap Metro with [`@react-native-media-styles/metro`](../metro/README.md). Core companions deliver responsive token CSS; the Metro adapter also delivers ordinary RNW rules registered after Expo captures its initial stylesheet, preventing incomplete backgrounds, widths, and other component styles on the first paint.
+
 Render `<BreakpointStyles tokens={[card, title]} />` in the component that consumes those tokens or in an ancestor that knows the tokens. It does not need to be adjacent to the styled element and does not discover tokens in descendants. If content is inside a Suspense boundary, keep its companion inside the same boundary, or declare the resources in an ancestor that renders before the boundary is revealed. Do not place the companion inside a `Text` component.
 
 On web, the companion declares immutable React 19 stylesheet resources. React places them in the document head and deduplicates identical tokens. With streaming SSR, a delayed component's resources travel with its content, and React activates the styles before revealing that boundary. On client navigation, newly rendered components declare their resources normally. On native, the companion returns `null`.
 
-There is no eager-import list, application-wide stylesheet, build-time extraction, or manual `+html.tsx` injection. Keep Expo Router's normal custom-document nodes and attributes. The [Expo demo](../../examples/expo/README.md) shows SSR, SPA, and static export using the same components.
+There is no eager-import list, application-wide stylesheet, build-time extraction, or manual stylesheet injection in the server document. The [Expo demo](../../examples/expo/README.md) shows SSR, SPA, and static export using the same components.
 
 Each token owns its complete ordered CSS block. Identical normalized tokens share a resource identity; differently ordered tokens use different identities, so registration or boundary completion order cannot change their cascade. Server and client must create tokens from the same inputs. Changing a token's content creates a new resource identity. React may retain stylesheet resources after their components unmount.
 
