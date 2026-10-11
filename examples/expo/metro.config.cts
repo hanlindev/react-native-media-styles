@@ -3,8 +3,8 @@ const {
   getDefaultConfig,
 }: typeof import('expo/metro-config') = require('expo/metro-config');
 const {
-  withMediaStyles,
-}: typeof import('@react-native-media-styles/metro') = require('@react-native-media-styles/metro');
+  withStreamingStyles,
+}: typeof import('react-native-web-streaming-styles') = require('react-native-web-streaming-styles');
 
 const config = getDefaultConfig(__dirname);
 // The library is linked to source outside this app. Resolve its React imports
@@ -24,7 +24,7 @@ const resolveRequest: NonNullable<typeof config.resolver.resolveRequest> = (
   }
   return context.resolveRequest(context, name, platform);
 };
-module.exports = withMediaStyles({
+module.exports = withStreamingStyles({
   ...config,
   resolver: {...config.resolver, resolveRequest},
 });

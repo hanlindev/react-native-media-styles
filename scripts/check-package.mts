@@ -23,7 +23,12 @@ try {
 }
 if (!npm)
   throw new Error('npm is required to inspect the published package contents');
-for (const pkg of ['core', 'metro', 'babel-plugin']) {
+const names: Record<string, string> = {
+  core: '@react-native-media-styles/core',
+  metro: 'react-native-web-streaming-styles',
+  'babel-plugin': '@react-native-media-styles/babel-plugin',
+};
+for (const pkg of Object.keys(names)) {
   const directory = fileURLToPath(
     new URL(`../packages/${pkg}/`, import.meta.url),
   );
@@ -37,7 +42,7 @@ for (const pkg of ['core', 'metro', 'babel-plugin']) {
     result.stdout,
   );
   const [{name, files}] = payload;
-  assert.equal(name, `@react-native-media-styles/${pkg}`);
+  assert.equal(name, names[pkg]);
   const paths = files.map((file) => file.path);
   if (pkg === 'core') {
     assert(paths.includes('src/BreakpointStyles.web.ts'));

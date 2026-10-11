@@ -1,4 +1,4 @@
-import originalCreateSheet from '@react-native-media-styles/metro/original-ordered-sheet';
+import originalCreateSheet from 'react-native-web-streaming-styles/original-ordered-sheet';
 import {registry} from './registry';
 
 export default function createOrderedSheet(sheet: unknown) {

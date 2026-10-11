@@ -1,5 +1,5 @@
 {
-  "name": "@react-native-media-styles/metro",
+  "name": "react-native-web-streaming-styles",
   "version": "0.1.0",
   "description": "Metro adapter for streaming React Native Web stylesheet delivery.",
   "license": "MIT",
@@ -15,9 +15,6 @@
       "types": "./dist/metro.d.cts",
       "default": "./dist/metro.cjs"
     }
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

@@ -21,7 +21,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~57.0.16",
     "@react-native-media-styles/core": "workspace:*",
-    "@react-native-media-styles/metro": "workspace:*",
+    "react-native-web-streaming-styles": "workspace:*",
     "expo": "~57.0.27",
     "expo-constants": "~57.0.21",
     "expo-linking": "~57.0.12",

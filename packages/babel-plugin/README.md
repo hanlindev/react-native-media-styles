@@ -1,6 +1,6 @@
 # @react-native-media-styles/babel-plugin
 
-Optional Babel 7 plugin that inserts core `BreakpointStyles` companions for React components using `useBreakpointStyle` or `useBreakpointStyles` directly. Requires the same React 19 web setup as core; it adds no runtime package beyond core.
+Optional Babel 7 plugin. It inserts core `BreakpointStyles` for components that call `useBreakpointStyle` or `useBreakpointStyles` directly. It expects the same React 19 web setup as core, and it does not pull in another runtime package.
 
 ## Expo setup
 
@@ -8,7 +8,7 @@ Optional Babel 7 plugin that inserts core `BreakpointStyles` companions for Reac
 pnpm add -D @react-native-media-styles/babel-plugin babel-preset-expo
 ```
 
-Add the plugin to your existing Babel configuration:
+Add the plugin to the Babel config:
 
 ```ts
 // babel.config.cts
@@ -18,9 +18,7 @@ module.exports = {
 };
 ```
 
-Restart Metro with its cache cleared after enabling the plugin. Keep `withMediaStyles` in your Metro config to deliver ordinary React Native Web styles.
-
-## Use the hooks without companions
+## Hooks without a companion
 
 ```tsx
 import {View, type ViewStyle} from 'react-native';
@@ -38,16 +36,16 @@ export function Card({expanded}: {expanded: boolean}) {
 }
 ```
 
-The plugin records the combined token and wraps the component's result in a fragment containing its companion. Inline `useBreakpointStyle(token)` calls work too. Token expressions are evaluated once, and collection is local to each render. Lazy components deliver their resources inside their own Suspense boundaries. Core still owns stylesheet identity and deduplication; nothing is eagerly imported or extracted to a global stylesheet.
+The plugin records the combined token and wraps the return value in a fragment that includes the companion. An inline `useBreakpointStyle(token)` call works the same way. Token expressions run once, and collection stays inside that render. A lazy component's resources stay inside its own Suspense boundary. Core still owns stylesheet identity and deduping. Nothing is imported eagerly, and nothing is extracted into a global sheet.
 
-Named, aliased, and namespace imports from `@react-native-media-styles/core` are recognized by their bindings. Unrelated or shadowed functions are unchanged. TypeScript/JSX components and memo/forwardRef callbacks with JSX are supported.
+The plugin matches imports from `@react-native-media-styles/core` by binding: named, aliased, and namespace imports all count. A different function with the same name, or a shadowed binding, is left alone. TypeScript and JSX components work, including `memo` and `forwardRef` callbacks that return JSX.
 
-Single-child parents clone the component element before it renders, so the generated fragment preserves normal `Children.only`, slot, ref and event behavior. Forward the parent's props and ref to your host element. Browser tests exercise the plugin with both plain DOM elements and Metro-adapted RNW components. Invoke components through JSX; their transformed return value includes resource siblings.
+A parent that requires a single child clones the element before render, so `Children.only`, slots, refs, and events still work. Forward that parent's props and ref to your host element. Browser tests cover plain DOM nodes and Metro-adapted RNW components. Render the component from JSX. The transformed function returns the resource siblings next to the element.
 
-Companions require an HTML rendering context. For a component rendered inside SVG, use manual companions in an HTML ancestor and exclude that component's file from this plugin through Babel overrides. React treats style elements inside SVG as SVG content rather than hoisted HTML resources.
+Companions need an HTML render context. For a component that renders inside SVG, put a manual companion on an HTML ancestor and skip that file with a Babel override. React treats a style element inside SVG as SVG content, so it will not hoist it as an HTML resource.
 
 ## Scope
 
-Use the supported hooks directly in the component. Hook calls hidden behind custom hooks or re-exported wrappers are not discovered; retain explicit companions for those cases. Uppercase component functions and functions containing JSX are transformed. Existing manual companions can coexist during migration because React deduplicates token resources, though they are redundant in transformed components.
+Call the supported hooks in the component itself. A call inside a custom hook, or behind a re-exported wrapper, is not found. Those components still need an explicit companion. The plugin transforms uppercase component functions and any function that contains JSX. Manual companions can stay during a migration: React dedupes the token, so the extra one is only redundant.
 
-The [Expo demo](../../examples/expo/README.md) enables this plugin and uses both hooks without manual companions. The plugin does not compose separate responsive style-array entries; use `useBreakpointStyles` for token merging.
+The [Expo demo](../../examples/expo/README.md) enables this plugin and uses both hooks with no manual companions. The plugin does not merge separate responsive entries in a style array. Use `useBreakpointStyles` for that.

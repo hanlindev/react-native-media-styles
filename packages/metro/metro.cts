@@ -10,7 +10,7 @@ type Resolver = (
 type ResolverConfig = {resolveRequest?: Resolver | null};
 
 /** Preserve the application's resolver, then adapt RNW's DOM element factory. */
-export function withMediaStyles<T extends {resolver?: object}>(config: T): T {
+export function withStreamingStyles<T extends {resolver?: object}>(config: T): T {
   const resolver: ResolverConfig = config.resolver ?? {};
   const previous = resolver.resolveRequest;
   const resolve: Resolver = (context, name, platform) =>
@@ -27,7 +27,7 @@ export function withMediaStyles<T extends {resolver?: object}>(config: T): T {
         platform: string | null,
       ) {
         if (
-          name === '@react-native-media-styles/metro/original-create-element'
+          name === 'react-native-web-streaming-styles/original-create-element'
         ) {
           return resolve(
             context,
@@ -36,7 +36,7 @@ export function withMediaStyles<T extends {resolver?: object}>(config: T): T {
           );
         }
         if (
-          name === '@react-native-media-styles/metro/original-ordered-sheet'
+          name === 'react-native-web-streaming-styles/original-ordered-sheet'
         ) {
           return resolve(
             context,

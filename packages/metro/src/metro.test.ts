@@ -1,5 +1,5 @@
 import {expect, it, vi} from 'vitest';
-import {withMediaStyles} from '../dist/metro.cjs';
+import {withStreamingStyles} from '../dist/metro.cjs';
 
 it('intercepts ordered-sheet registration only on web and bypasses its original import', () => {
   const filePath =
@@ -10,7 +10,7 @@ it('intercepts ordered-sheet registration only on web and bypasses its original 
       filePath,
     }),
   );
-  const config = withMediaStyles({resolver: {resolveRequest}});
+  const config = withStreamingStyles({resolver: {resolveRequest}});
   expect(
     config.resolver
       .resolveRequest({}, './createOrderedCSSStyleSheet', 'web')
@@ -23,7 +23,7 @@ it('intercepts ordered-sheet registration only on web and bypasses its original 
   expect(
     config.resolver.resolveRequest(
       {},
-      '@react-native-media-styles/metro/original-ordered-sheet',
+      'react-native-web-streaming-styles/original-ordered-sheet',
       'web',
     ).filePath,
   ).toBe(filePath);
@@ -46,7 +46,7 @@ function setup() {
     }),
   );
   const config = {resolver: {resolveRequest}, watchFolders: ['/app']};
-  return {config, resolveRequest, wrapped: withMediaStyles(config)};
+  return {config, resolveRequest, wrapped: withStreamingStyles(config)};
 }
 
 it('the compiled entry redirects web elements to the shipped source and preserves the resolver', () => {
@@ -93,7 +93,7 @@ it('preserves native resolution and bypasses interception for the original web f
   expect(
     wrapped.resolver.resolveRequest(
       context,
-      '@react-native-media-styles/metro/original-create-element',
+      'react-native-web-streaming-styles/original-create-element',
       'web',
     ).filePath,
   ).toContain('react-native-web/dist/exports/createElement');

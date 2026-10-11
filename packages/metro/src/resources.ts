@@ -98,7 +98,7 @@ export function sheetResources(css: string) {
       group = Number(marker[1]);
       if (!GROUPS.some((supported) => supported === group)) {
         throw new Error(
-          `Unsupported RNW stylesheet group ${group}. Update @react-native-media-styles/metro.`,
+          `Unsupported RNW stylesheet group ${group}. Update react-native-web-streaming-styles.`,
         );
       }
     } else if (line) {

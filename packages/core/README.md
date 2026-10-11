@@ -1,10 +1,10 @@
 # @react-native-media-styles/core
 
-`breakpoints()` turns a map of media queries to React Native style objects into one style value. On the web, each declaration becomes its own class and each query is emitted inside `@media`. On native, `useBreakpointStyle` merges the queries that match the window and the color scheme.
+`breakpoints()` takes a map of media queries to React Native style objects and returns one style value. On the web, each declaration becomes its own class and each query is emitted inside `@media`. On native, `useBreakpointStyle` merges the queries that match the window and the color scheme.
 
 ## Install
 
-The package expects `react` and `react-native` in the app.
+The app needs `react` and `react-native` installed already.
 
 ```sh
 npm install @react-native-media-styles/core
@@ -12,7 +12,7 @@ npm install @react-native-media-styles/core
 
 ## Usage
 
-The type argument is required. `ViewStyle`, `TextStyle`, and `ImageStyle` are the style objects React Native defines for those components.
+The type argument is required. Use `ViewStyle`, `TextStyle`, or `ImageStyle`, the style types React Native already defines for those components.
 
 ```tsx
 import {Text, View, type TextStyle, type ViewStyle} from 'react-native';
@@ -46,25 +46,25 @@ export function Example() {
 }
 ```
 
-`base` always applies first, regardless of where it appears in the map. Later matching query entries override earlier ones. Query complexity does not increase selector specificity. This order is independent of when other tokens are registered.
+`base` always applies first, wherever it sits in the map. Later matching queries override earlier ones. A more complicated query is not more specific, and other tokens can be created in any order.
 
-Within each entry, spacing edges override axes, and axes override the shorthand, regardless of JavaScript property order. For example, `{paddingLeft: 8, paddingHorizontal: 16, padding: 20}` produces left 8, right 16, and top/bottom 20. A later matching `{padding: 24}` replaces all four edges. Both platforms consume the same copied, frozen, normalized token.
+Inside one entry, a spacing edge beats an axis, and an axis beats the shorthand. Property order in the object does not matter. `{paddingLeft: 8, paddingHorizontal: 16, padding: 20}` comes out as left 8, right 16, and top/bottom 20. A later matching `{padding: 24}` replaces all four edges. Both platforms consume the same copied, frozen, normalized token.
 
-`breakpoints()` throws when a query is invalid. These features, combined with `and`, are valid:
+`breakpoints()` throws if a query is invalid. These features are valid on their own, and combined with `and`:
 
-- `min-width`, `max-width`, and `width`, written as `px` lengths (`0` is also valid)
-- `orientation`, with `portrait` or `landscape`
-- `prefers-color-scheme`, with `light` or `dark`
+- `min-width`, `max-width`, and `width`, written as `px` lengths (`0` is allowed)
+- `orientation`, `portrait` or `landscape`
+- `prefers-color-scheme`, `light` or `dark`
 
-Call `breakpoints()` while the module is loading. Token creation copies, normalizes, and freezes the declarations without inserting CSS into the DOM. `useBreakpointStyle` returns the token's style value.
+Call `breakpoints()` at module scope, while the module loads. Creating a token copies, normalizes, and freezes the declarations. It does not write CSS into the DOM. `useBreakpointStyle` returns that token's style value.
 
-Pass the token through in a style array when a component also has other styles:
+If the element has other styles too, pass the hook result through a style array:
 
 ```tsx
 <View style={[useBreakpointStyle(card), {margin: 8}]} />
 ```
 
-To combine responsive tokens on one element, pass an ordered array to `useBreakpointStyles`:
+To combine several tokens on one element, pass them in order to `useBreakpointStyles`:
 
 ```tsx
 const {token, style} = useBreakpointStyles([
@@ -81,15 +81,15 @@ return (
 );
 ```
 
-Import `useBreakpointStyles` from this package. Each array entry can be a token, `null`, `undefined`, or a boolean; both `true` and `false` are ignored. Mutable and readonly arrays are accepted. The hook merges definitions for each identical query string, including `base`. Within a query, later array entries win conflicts for each normalized property; null/undefined declarations are ignored. The combined base applies first, followed by matching queries in their first-appearance order across the array. Equivalent queries written as different strings are not grouped, and query complexity does not increase precedence. With no active tokens (including `useBreakpointStyles([])`), the result is empty. Supply the returned combined `token` to the companion. No Babel plugin is required.
+Import `useBreakpointStyles` from this package. Each array entry can be a token, `null`, `undefined`, or a boolean. Both `true` and `false` are ignored. Mutable and readonly arrays are fine. Entries that share a query string are merged, `base` included. Inside a query, a later entry wins per normalized property, and null or undefined declarations are skipped. The merged base applies first, then matching queries in the order each query string first appeared. Queries that mean the same thing but are spelled differently stay separate, and a more complicated query is not more specific. With no active tokens, including `useBreakpointStyles([])`, the result is empty. Pass the returned `token` to the companion. A Babel plugin is not required for this.
 
-Use one responsive style value per element: putting separate `useBreakpointStyle` results in a style array does not establish their precedence on web. Generated selectors repeat their class three times and have equal specificity across queries. They outrank React Native Web's single-class selectors and Metro's doubled selectors in either stylesheet order. Ordinary inline styles can override generated classes.
+One element should have one responsive style value. Putting several `useBreakpointStyle` results in a single style array does not give them an order on web. Generated selectors repeat their class three times, and every query has the same specificity. They outrank React Native Web's single-class selectors and Metro's doubled selectors, in either stylesheet order. An inline style can still override a generated class.
 
 ## Supported styles
 
-Pass plain style objects, rather than registered style IDs or the output of `StyleSheet.create`. In TypeScript, pass a generic type argument (`ViewStyle`, `TextStyle`, or `ImageStyle`) to preserve the component's property and value types. The breakpoint input type exposes only properties supported by the serializer: dimensions, physical margin/padding shorthands and edges, gap, flex and alignment, font size/line height/weight, position/insets, aspect ratio, opacity, and z-index. Use ordinary React Native styles for other properties, such as colors, borders, and transforms.
+Pass plain style objects. In TypeScript, pass a style object type argument to type-check the style object fields. The input type only lists what the serializer can emit: dimensions, physical margin and padding (shorthands and edges), gap, flex and alignment, font size, line height, font weight, position and insets, aspect ratio, opacity, and z-index. Colors, borders, transforms, and the rest are not supported by this library yet.
 
-Style properties and values are checked by TypeScript only; the library does not validate them at runtime. JavaScript callers must supply supported declarations. Null/undefined declarations are ignored. For reusable declarations, use the exported `BreakpointStyle` type:
+TypeScript is the only check. Nothing validates properties at runtime, so JavaScript callers have to stick to supported declarations. Null and undefined declarations are ignored. For a reusable declaration, use `BreakpointStyle`:
 
 ```tsx
 const spacing: BreakpointStyle<ViewStyle> = {padding: 16, gap: 8};
@@ -97,23 +97,29 @@ const card = breakpoints<ViewStyle>({base: spacing});
 // Unsupported properties such as transform cause a TypeScript error.
 ```
 
-`flex` is normalized to explicit longhands on both platforms using Yoga's native defaults (`useWebDefaults: false`). A positive value becomes `flexGrow: value`, `flexShrink: 0`, and `flexBasis: 0`. Zero becomes grow 0, shrink 0, and basis `'auto'`. A negative value becomes grow 0, shrink the absolute value, and basis `'auto'` (for example, `flex: -1` gives shrink 1). Web uses these same values instead of the browser's numeric CSS shorthand. Explicit `flexGrow`, `flexShrink`, or `flexBasis` declarations override the shorthand within the same entry, regardless of property order. To allow a growing item to shrink, use `{flex: 1, flexShrink: 1}`.
+`flex` is expanded to longhands on both platforms, using Yoga's native defaults (`useWebDefaults: false`):
+
+- A positive number becomes `flexGrow` of that value, `flexShrink: 0`, and `flexBasis: 0`.
+- `0` becomes grow 0, shrink 0, and basis `'auto'`.
+- A negative number becomes grow 0, shrink of the absolute value, and basis `'auto'`. `flex: -1` shrinks by 1.
+
+Web writes those same longhands, not the browser's numeric `flex` shorthand. An explicit `flexGrow`, `flexShrink`, or `flexBasis` in the same entry overrides the shorthand, in any property order. To let a growing item shrink, write `{flex: 1, flexShrink: 1}`.
 
 ## Web stylesheet
 
-The optional [Babel plugin](../babel-plugin/README.md) inserts companions automatically for components that call the breakpoint hooks directly. The Expo demo uses this approach. Without it, render companions explicitly as shown below.
+The [Babel plugin](../babel-plugin/README.md) inserts companions for components that call the hooks directly. The Expo demo does that. Without the plugin, render `BreakpointStyles` yourself, as in the example above.
 
-For Expo Router streaming SSR, wrap Metro with [`@react-native-media-styles/metro`](../metro/README.md). Core companions deliver responsive token CSS; the Metro adapter also delivers ordinary RNW rules registered after Expo captures its initial stylesheet, preventing incomplete backgrounds, widths, and other component styles on the first paint.
+Expo Router streaming SSR needs Metro wrapped with `[react-native-web-streaming-styles](../metro/README.md)`. Core companions emit the token CSS. The Metro adapter also emits RNW rules that register after Expo has captured its initial stylesheet, so backgrounds, widths, and the rest of the component styles are there on first paint.
 
-Render `<BreakpointStyles tokens={[card, title]} />` in the component that consumes those tokens or in an ancestor that knows the tokens. It does not need to be adjacent to the styled element and does not discover tokens in descendants. If content is inside a Suspense boundary, keep its companion inside the same boundary, or declare the resources in an ancestor that renders before the boundary is revealed. Do not place the companion inside a `Text` component.
+Render `<BreakpointStyles tokens={[card, title]} />` in the component that uses those tokens, or in an ancestor that already has them. It does not have to sit next to the styled element, and it does not search descendants for tokens. If the content is behind Suspense, keep the companion inside that boundary, or render it on an ancestor that commits before the boundary is revealed. Do not put the companion inside `Text`.
 
-On web, the companion declares immutable React 19 stylesheet resources. React places them in the document head and deduplicates identical tokens. With streaming SSR, a delayed component's resources travel with its content, and React activates the styles before revealing that boundary. On client navigation, newly rendered components declare their resources normally. On native, the companion returns `null`.
+On web the companion renders immutable React 19 stylesheet resources. React moves them to `<head>` and dedupes identical tokens. In a streaming response, a delayed component's CSS travels with its content, and React applies it before that boundary is revealed. On a client navigation, a newly rendered component declares its resources the same way. On native the companion returns `null`.
 
-There is no eager-import list, application-wide stylesheet, build-time extraction, or manual stylesheet injection in the server document. The [Expo demo](../../examples/expo/README.md) shows SSR, SPA, and static export using the same components.
+There is no import list to maintain, and no stylesheet to inject into the server document. The [Expo demo](../../examples/expo/README.md) runs SSR, SPA, and static export from the same components.
 
-Each token owns its complete ordered CSS block. Identical normalized tokens share a resource identity; differently ordered tokens use different identities, so registration or boundary completion order cannot change their cascade. Server and client must create tokens from the same inputs. Changing a token's content creates a new resource identity. React may retain stylesheet resources after their components unmount.
+Each token owns one complete, ordered CSS block. Tokens that normalize to the same declarations share a resource id. A different declaration order is a different id, so finish order across boundaries cannot reshuffle the cascade. Server and client must build tokens from the same inputs. Editing a token's content creates a new id. React may leave a stylesheet resource in the document after its component unmounts.
 
-For example, independently created tokens with the same definitions reuse one stylesheet resource:
+Two tokens created separately, with the same definitions, share one resource:
 
 ```tsx
 const cardA = breakpoints<ViewStyle>({base: {padding: 16}});
@@ -123,7 +129,7 @@ const cardB = breakpoints<ViewStyle>({base: {padding: 16}});
 <BreakpointStyles tokens={[cardA, cardB]} />;
 ```
 
-Rule order is preserved inside each token. Both queries below match at a width of 1000px, so the last entry wins:
+Order inside a token is the cascade. Both queries below match at 1000px, so the later entry wins:
 
 ```tsx
 const wideLast = breakpoints<ViewStyle>({
@@ -139,7 +145,7 @@ const narrowLast = breakpoints<ViewStyle>({
 // They have different CSS identities, regardless of which renders first.
 ```
 
-Composition merges definitions before evaluating queries, so a later base does not erase an earlier token's responsive overrides:
+Composition merges the definitions before any query is tested, so a later `base` does not wipe an earlier token's responsive overrides:
 
 ```tsx
 const regular = breakpoints<ViewStyle>({base: {padding: 16}});
@@ -153,7 +159,7 @@ const reverse = useBreakpointStyles([roomy, regular]); // Also 16 below; 24 at/a
 // Declare forward.token or reverse.token in the companion for its consumer.
 ```
 
-When tokens define the same query, their properties merge with later values winning:
+When two tokens define the same query, properties merge and the later value wins:
 
 ```tsx
 const first = breakpoints<ViewStyle>({
@@ -171,9 +177,9 @@ const combined = useBreakpointStyles([first, second]);
 // Combined 800px query: all padding edges 24; opacity 1.
 ```
 
-Spacing is normalized before merging: a later `paddingLeft` changes only the left edge of an earlier `padding`. A later `padding` changes all four edges. For distinct queries that both match, the query first encountered later wins, even if an earlier query is repeated in a subsequent token.
+Spacing is normalized before the merge. A later `paddingLeft` changes only the left edge of an earlier `padding`. A later `padding` replaces all four edges. If two different queries both match, the one that appears later in the merged list wins, even when a later token repeats an earlier query.
 
-For SSR, declare the same queries on the server and client. The browser evaluates the queries; token definitions should not depend on `window.innerWidth`:
+SSR needs the same queries on the server and the client. The browser evaluates them, so token definitions should not depend on `window.innerWidth`:
 
 ```tsx
 // Shared module imported on both server and client.
@@ -183,7 +189,7 @@ const responsiveCard = breakpoints<ViewStyle>({
 });
 ```
 
-An ancestor can deliver the CSS for a nested element. When this component unmounts, React may keep its stylesheet in the head. That CSS only affects elements using the generated classes; remounting reuses it:
+An ancestor can emit CSS for a nested element. After this component unmounts, React may keep the sheet in `<head>`. The rules only match elements that use the generated classes, and mounting again reuses them:
 
 ```tsx
 function CardSection() {
@@ -202,18 +208,18 @@ function CardSection() {
 return showCard ? <CardSection /> : null;
 ```
 
-Tokens are immutable. Selecting a token with different declarations (or changing the active tokens in the array passed to `useBreakpointStyles`) selects a different resource identity rather than editing the old stylesheet.
+Tokens do not change after creation. Choosing a token with different declarations, or changing the active entries passed to `useBreakpointStyles`, selects a different resource. The previous sheet is not edited.
 
-`getBreakpointSheet(tokens)` remains an explicit serializer for tests or buffered/manual consumers:
+`getBreakpointSheet(tokens)` serializes an explicit list, for tests or for a caller that buffers the CSS itself:
 
 ```ts
 const css = getBreakpointSheet([card, title]);
 ```
 
-It deduplicates the supplied tokens and returns their CSS. It does not read a global registry or collect every loaded module. It returns an empty string on native. Do not inject this CSS separately when those tokens are already delivered by companions.
+It dedupes the tokens you pass and returns their CSS. It does not read a global registry or walk loaded modules. On native it returns an empty string. If companions are already rendering those tokens, do not inject this string as well.
 
-Migration from the MVP: add companions beside the styled components and remove global stylesheet injection. `getBreakpointSheet()` now requires an explicit token list.
+Coming from the MVP: render companions next to the styled components, and remove the global stylesheet injection. `getBreakpointSheet()` now takes the token list as an argument.
 
 ## Native queries
 
-On native, the hook reads the window size and the appearance color scheme. It starts from `base`, then merges every matching query in source order. A rotation or theme change runs the merge again.
+On native, the hook reads the window size and the appearance color scheme. It starts from `base`, then merges every matching query in source order. A rotation or a theme change runs that merge again.

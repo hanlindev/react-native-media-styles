@@ -4,7 +4,7 @@ import {
   isValidElement,
   type ReactElement,
 } from 'react';
-import originalCreateElement from '@react-native-media-styles/metro/original-create-element';
+import originalCreateElement from 'react-native-web-streaming-styles/original-create-element';
 import {registry} from './registry';
 
 const elements = new WeakMap<object, ReturnType<typeof createElement>>();

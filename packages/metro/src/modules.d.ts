@@ -1,4 +1,4 @@
-declare module '@react-native-media-styles/metro/original-create-element' {
+declare module 'react-native-web-streaming-styles/original-create-element' {
   import type {ReactElement} from 'react';
   export default function createElement(
     component: unknown,
@@ -10,7 +10,7 @@ declare module 'react-native-web/dist/exports/StyleSheet' {
   const StyleSheet: {getSheet(): {id: string; textContent: string}};
   export default StyleSheet;
 }
-declare module '@react-native-media-styles/metro/original-ordered-sheet' {
+declare module 'react-native-web-streaming-styles/original-ordered-sheet' {
   export default function createOrderedSheet(sheet: unknown): {
     insert(css: string, group: number): void;
     getTextContent(): string;

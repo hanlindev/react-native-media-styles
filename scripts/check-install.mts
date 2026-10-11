@@ -39,7 +39,12 @@ const dependencies: Record<string, string> = {
   '@babel/core': '7.29.7',
   esbuild: '0.25.12',
 };
-for (const pkg of ['core', 'metro', 'babel-plugin']) {
+const packageNames: Record<string, string> = {
+  core: '@react-native-media-styles/core',
+  metro: 'react-native-web-streaming-styles',
+  'babel-plugin': '@react-native-media-styles/babel-plugin',
+};
+for (const pkg of Object.keys(packageNames)) {
   const cwd = fileURLToPath(new URL(`../packages/${pkg}/`, import.meta.url));
   const packed: {filename: string}[] = JSON.parse(
     run(
@@ -47,7 +52,7 @@ for (const pkg of ['core', 'metro', 'babel-plugin']) {
       cwd,
     ),
   );
-  dependencies[`@react-native-media-styles/${pkg}`] =
+  dependencies[packageNames[pkg]] =
     `file:${join(directory, packed[0].filename).replaceAll('\\', '/')}`;
 }
 writeFileSync(
@@ -65,12 +70,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const babel = require('@babel/core');
 const esbuild = require('esbuild');
-for (const pkg of ['core', 'metro', 'babel-plugin']) {
-  assert.ok(fs.realpathSync(require.resolve('@react-native-media-styles/' + pkg)).startsWith(fs.realpathSync(__dirname) + path.sep));
+for (const pkg of ['@react-native-media-styles/core', 'react-native-web-streaming-styles', '@react-native-media-styles/babel-plugin']) {
+  assert.ok(fs.realpathSync(require.resolve(pkg)).startsWith(fs.realpathSync(__dirname) + path.sep));
 }
-const {withMediaStyles} = require('@react-native-media-styles/metro');
+const {withStreamingStyles} = require('react-native-web-streaming-styles');
 const original = require.resolve('react-native-web/dist/exports/createElement');
-const config = withMediaStyles({resolver: {resolveRequest: (_context, name) => ({type: 'sourceFile', filePath: require.resolve(name)})}});
+const config = withStreamingStyles({resolver: {resolveRequest: (_context, name) => ({type: 'sourceFile', filePath: require.resolve(name)})}});
 const factory = config.resolver.resolveRequest({originModulePath: require.resolve('react-native-web/dist/exports/View')}, 'react-native-web/dist/exports/createElement', 'web').filePath;
 assert.ok(fs.realpathSync(factory).startsWith(fs.realpathSync(__dirname) + path.sep));
 const ordered = config.resolver.resolveRequest({}, 'react-native-web/dist/exports/StyleSheet/dom/createOrderedCSSStyleSheet', 'web').filePath;
@@ -103,8 +108,8 @@ fs.writeFileSync('adapter.jsx', [
   'export const html = renderToStaticMarkup(createElement("div", {dir:"rtl", style:{$$css:true,height:"r-packed"}, children:"adapter"}));',
 ].join('\\n'));
 esbuild.buildSync({entryPoints:['adapter.jsx'], outfile:'adapter.cjs', bundle:true, platform:'node', format:'cjs', external:['react','react-dom/server'], alias:{
-  '@react-native-media-styles/metro/original-create-element': original,
-  '@react-native-media-styles/metro/original-ordered-sheet': config.resolver.resolveRequest({}, '@react-native-media-styles/metro/original-ordered-sheet', 'web').filePath,
+  'react-native-web-streaming-styles/original-create-element': original,
+  'react-native-web-streaming-styles/original-ordered-sheet': config.resolver.resolveRequest({}, 'react-native-web-streaming-styles/original-ordered-sheet', 'web').filePath,
 }});
 const adapterHTML = require('./adapter.cjs').html;
 assert.match(adapterHTML, /\\.r-packed\\.r-packed\\{height:23px;/);
