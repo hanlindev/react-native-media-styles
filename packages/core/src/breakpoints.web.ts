@@ -45,7 +45,9 @@ function createToken(
       style: Object.fromEntries(orderedStyleEntries(style)),
     })),
   );
-  const scope = hash(`rnms-v2:${identity}`);
+  // Include the selector revision so retained React resources cannot reuse
+  // CSS generated with the earlier, lower specificity after a library update.
+  const scope = hash(`rnms-specificity3:${identity}`);
   const rules: string[] = [];
   for (const [index, entry] of entries.entries()) {
     for (const rule of compileAtomic(entry.style, `${scope}-${index}`)) {
@@ -59,7 +61,7 @@ function createToken(
     entries,
     style: Object.freeze(compiled),
   });
-  setTokenResource(token, {id: `rnms-v2-${scope}`, css: rules.join('')});
+  setTokenResource(token, {id: `rnms-${scope}`, css: rules.join('')});
   return token;
 }
 

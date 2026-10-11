@@ -96,7 +96,11 @@ for (const [mode, port] of [
     );
     await expect(page.getByTestId('counter')).toHaveCSS('padding-left', '31px');
     const countResources = () =>
-      page.locator('head style[data-href^="rnms-v2-"]').count();
+      page
+        .locator(
+          'head style[data-precedence="react-native-media-styles"][data-href^="rnms-"]',
+        )
+        .count();
     const before = await countResources();
     expect(before).toBeGreaterThan(0);
     expect(requests.some((url) => /\/details-[^/]+\.js/.test(url))).toBe(false);

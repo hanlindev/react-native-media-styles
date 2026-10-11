@@ -25,10 +25,10 @@ export function compileAtomic(style: object, scope: string): AtomicRule[] {
     return {
       property,
       className,
-      // React hoists resource styles before ordinary RNW stylesheets. Repeating
-      // the class makes responsive rules outrank RNW resets independently of
-      // insertion order; every generated selector still has equal specificity.
-      rule: `.${className}.${className}{${cssProperty}:${cssValue}}`,
+      // Three classes outrank Metro's doubled RNW classes in either sheet
+      // order. All responsive queries retain equal specificity; inline styles
+      // remain the explicit override.
+      rule: `.${className}.${className}.${className}{${cssProperty}:${cssValue}}`,
     };
   });
 }

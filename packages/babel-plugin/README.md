@@ -42,6 +42,10 @@ The plugin records the combined token and wraps the component's result in a frag
 
 Named, aliased, and namespace imports from `@react-native-media-styles/core` are recognized by their bindings. Unrelated or shadowed functions are unchanged. TypeScript/JSX components and memo/forwardRef callbacks with JSX are supported.
 
+Single-child parents clone the component element before it renders, so the generated fragment preserves normal `Children.only`, slot, ref and event behavior. Forward the parent's props and ref to your host element. Browser tests exercise the plugin with both plain DOM elements and Metro-adapted RNW components. Invoke components through JSX; their transformed return value includes resource siblings.
+
+Companions require an HTML rendering context. For a component rendered inside SVG, use manual companions in an HTML ancestor and exclude that component's file from this plugin through Babel overrides. React treats style elements inside SVG as SVG content rather than hoisted HTML resources.
+
 ## Scope
 
 Use the supported hooks directly in the component. Hook calls hidden behind custom hooks or re-exported wrappers are not discovered; retain explicit companions for those cases. Uppercase component functions and functions containing JSX are transformed. Existing manual companions can coexist during migration because React deduplicates token resources, though they are redundant in transformed components.

@@ -1,37 +1,49 @@
-import {createElement, Fragment} from 'react';
+import {
+  createElement,
+  Fragment,
+  isValidElement,
+  type ReactElement,
+} from 'react';
 import originalCreateElement from '@react-native-media-styles/metro/original-create-element';
-import StyleSheet from 'react-native-web/dist/exports/StyleSheet';
-import {sheetResources} from './resources';
+import {registry} from './registry';
 
-let lastCSS: string | undefined;
-let resources: ReturnType<typeof sheetResources> = [];
+const elements = new WeakMap<object, ReturnType<typeof createElement>>();
+
+export function elementClassName(element: ReactElement): string {
+  let node: unknown = element;
+  // RNW wraps elements with a writing direction in LocaleProvider. Preserve
+  // that provider while reading the actual host element's generated classes.
+  while (isValidElement<{className?: unknown; children?: unknown}>(node)) {
+    if (typeof node.props.className === 'string') return node.props.className;
+    node = node.props.children;
+  }
+  return '';
+}
 
 export default function createStyledElement(
   component: unknown,
   props: unknown,
   options?: unknown,
 ) {
-  // Resolve first: RNW may register rules while resolving DOM props.
+  // Resolving DOM props can register additional rules in RNW's sheet.
   const element = originalCreateElement(component, props, options);
-  const css = StyleSheet.getSheet().textContent;
-  if (css !== lastCSS) {
-    resources = sheetResources(css);
-    lastCSS = css;
-  }
+  const styles = registry.select(elementClassName(element)).map((resource) => {
+    let style = elements.get(resource);
+    if (!style) {
+      style = createElement(
+        'style',
+        {key: resource.id, href: resource.id, precedence: resource.precedence},
+        resource.css,
+      );
+      elements.set(resource, style);
+    }
+    return style;
+  });
+  // Keep the host in a stable position when its resource dependencies change.
   return createElement(
     Fragment,
     null,
-    ...resources.map((resource) =>
-      createElement(
-        'style',
-        {
-          key: resource.id,
-          href: resource.id,
-          precedence: resource.precedence,
-        },
-        resource.css,
-      ),
-    ),
+    createElement(Fragment, null, styles),
     element,
   );
 }

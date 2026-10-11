@@ -8,6 +8,8 @@
     "lint": "oxlint",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
+    "benchmark:css": "node examples/expo/scripts/benchmark-css.mts",
+    "test:install": "pnpm test:package && node scripts/check-install.mts",
     "demo:ssr": "pnpm --dir examples/expo start:ssr",
     "demo:spa": "pnpm --dir examples/expo start:spa",
     "test:package": "pnpm --filter @react-native-media-styles/metro build && pnpm --filter @react-native-media-styles/babel-plugin build && node scripts/check-package.mts"

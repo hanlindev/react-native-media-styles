@@ -118,13 +118,17 @@ it('hydrates SSR resources and reuses them without duplicates', async () => {
   try {
     expect(errors).toEqual([]);
     expect(
-      document.head.querySelectorAll('style[data-href^="rnms-v2-"]'),
+      document.head.querySelectorAll(
+        'style[data-precedence="react-native-media-styles"][data-href^="rnms-"]',
+      ),
     ).toHaveLength(1);
     await act(async () =>
       root.render(h(Fragment, null, app(token), app(token))),
     );
     expect(
-      document.head.querySelectorAll('style[data-href^="rnms-v2-"]'),
+      document.head.querySelectorAll(
+        'style[data-precedence="react-native-media-styles"][data-href^="rnms-"]',
+      ),
     ).toHaveLength(1);
   } finally {
     await act(async () => root.unmount());

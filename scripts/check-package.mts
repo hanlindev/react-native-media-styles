@@ -46,6 +46,8 @@ for (const pkg of ['core', 'metro', 'babel-plugin']) {
     assert(paths.includes('dist/metro.cjs'));
     assert(paths.includes('dist/metro.d.cts'));
     assert(paths.includes('src/createElement.ts'));
+    assert(paths.includes('src/orderedSheet.ts'));
+    assert(paths.includes('src/registry.ts'));
   } else {
     assert(paths.includes('dist/index.cjs'));
     assert(paths.includes('dist/index.d.cts'));

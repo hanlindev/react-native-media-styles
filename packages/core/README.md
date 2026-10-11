@@ -83,7 +83,7 @@ return (
 
 Import `useBreakpointStyles` from this package. Each array entry can be a token, `null`, `undefined`, or a boolean; both `true` and `false` are ignored. Mutable and readonly arrays are accepted. The hook merges definitions for each identical query string, including `base`. Within a query, later array entries win conflicts for each normalized property; null/undefined declarations are ignored. The combined base applies first, followed by matching queries in their first-appearance order across the array. Equivalent queries written as different strings are not grouped, and query complexity does not increase precedence. With no active tokens (including `useBreakpointStyles([])`), the result is empty. Supply the returned combined `token` to the companion. No Babel plugin is required.
 
-Use one responsive style value per element: putting separate `useBreakpointStyle` results in a style array does not establish their precedence on web. Generated selectors have equal specificity and deliberately outrank React Native Web's single-class selectors, including its default resets, regardless of stylesheet placement. Ordinary inline styles can override generated classes.
+Use one responsive style value per element: putting separate `useBreakpointStyle` results in a style array does not establish their precedence on web. Generated selectors repeat their class three times and have equal specificity across queries. They outrank React Native Web's single-class selectors and Metro's doubled selectors in either stylesheet order. Ordinary inline styles can override generated classes.
 
 ## Supported styles
 

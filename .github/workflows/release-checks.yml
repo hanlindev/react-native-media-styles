@@ -1,0 +1,36 @@
+name: Release checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint && pnpm fmt:check
+      - run: pnpm test
+      - run: pnpm typecheck
+      - run: pnpm test:install
+      - run: pnpm --dir examples/expo exec playwright install --with-deps chromium
+      - run: pnpm --dir examples/expo build:ssr
+      - run: pnpm --dir examples/expo build:spa
+      - run: pnpm --dir examples/expo build:static
+      - run: pnpm --dir examples/expo exec node scripts/expo.mts single export --platform android --platform ios --output-dir dist-native
+      - run: pnpm --dir examples/expo test:e2e
+      - run: node examples/expo/scripts/benchmark-css.mts > css-benchmark.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-check-results
+          path: |
+            examples/expo/test-results
+            css-benchmark.json

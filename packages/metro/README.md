@@ -1,6 +1,6 @@
 # @react-native-media-styles/metro
 
-Metro adapter for streaming React Native Web stylesheet delivery. Requires React 19 and React Native Web 0.21. Expo Router on Expo SDK 57 is the tested setup; Expo is not a dependency. This adapter uses RNW internals; other RNW versions need verification before widening the supported range.
+Metro adapter for streaming React Native Web stylesheet delivery. Requires React 19 and React Native Web 0.21. This adapter uses RNW internals and is only verified against the RNW version in the dependency list. Newer RNW version will keep working unless the APIs change.
 
 ```sh
 pnpm add @react-native-media-styles/metro
@@ -22,11 +22,15 @@ Continue using core `BreakpointStyles` companions for responsive tokens. This in
 
 ## How it works
 
-Expo's streaming renderer captures RNW's stylesheet before rendering routes. A route or lazy component can register additional styles after that capture. The adapter wraps RNW's DOM element factory on web. After resolving an element's DOM props, it declares the current RNW stylesheet as immutable React 19 resources beside the element. React hoists the resources into the head and activates them before revealing a Suspense boundary. The stream does not wait for all components to load. The browser also declares resources, so new client rules retain the same specificity and precedence as server rules. RNW continues its normal CSS insertion. Native resolution is unchanged.
+Expo's streaming renderer captures RNW's stylesheet before rendering routes. A route or lazy component can register additional styles after that capture. The adapter records rules as RNW inserts them and indexes them by generated class name. After resolving an element's DOM props, it declares that element's rules and global rules as immutable React 19 resources. RNW's locale providers retain their structure while the adapter reads the wrapped host's classes. React hoists the resources into the head and activates them before revealing a Suspense boundary. The stream does not wait for all components to load. The browser also declares resources, so new client rules retain the same specificity and precedence as server rules. RNW continues its normal CSS insertion. Native resolution is unchanged.
 
-Snapshots have content-based identities and React deduplicates them per document. Each RNW precedence group has its own resource, with all groups established in order, so a late shorthand still precedes earlier longhands. Generated selectors repeat their class to outrank Expo's incomplete legacy RNW stylesheet regardless of head placement. Inline styles still override these rules. The adapter caches only parsed immutable snapshots; it does not track emitted resources globally or change rules during a render. Aborted renders and separate requests therefore declare their resources independently.
+The public `unstable_createElement` factory and direct imports by third-party components keep their original element structure. This supports cloning factory results and `react-native-svg`, where inserted `<style>` elements would become SVG children and cause hydration mismatches. Automatic rule delivery covers RNW components; custom primitives using the public factory need their own SSR style delivery.
 
-Snapshots include the rules registered in that server module graph, and can duplicate some CSS when new modules register rules during a stream. They do not eagerly import routes or disable client code splitting. React may retain resources after navigation. Avoid creating unbounded distinct `StyleSheet.create` definitions from request data; use inline styles for arbitrary dynamic values.
+`Link asChild`, `Children.only`, cloning a component child, forwarded refs, focus, event handlers and Pressable render props are covered by browser regressions. Forward received props and refs to the intended host element. Expo's Slot requires a flattened style object on its direct child in development; use `StyleSheet.flatten` for that prop.
+
+Each rule has a content-based identity, and React deduplicates rules per document. All six RNW precedence groups are established in order, including groups that are initially empty, so a late shorthand still precedes earlier longhands. Generated selectors repeat their class to outrank Expo's incomplete legacy RNW stylesheet regardless of head placement. Inline styles still override these rules. Each element declares its dependencies independently. This supports aborted renders and separate requests. Resource siblings occupy a separate fragment so changing dependencies preserves child component state.
+
+Adding styles during rendering delivers each required rule once per document. Existing browser stylesheets are read once when an ordered sheet is created; rendering uses the class index. Parsed rules and React resource elements are cached. Per-element resource work depends on the element's classes and global rules. Use module-level styles for bounded definitions and inline styles for arbitrary dynamic values. React may retain resources after navigation.
 
 ## Layout stability
 

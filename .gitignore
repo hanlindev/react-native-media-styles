@@ -6,3 +6,9 @@ examples/expo/dist-*/
 *.tgz
 examples/expo/test-results/
 examples/expo/playwright-report/
+
+# Generated benchmark reports
+/css-benchmark.json
+/consumer-benchmark.json
+/docs/css-benchmark.json
+/docs/consumer-benchmark.json

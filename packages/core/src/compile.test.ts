@@ -14,10 +14,12 @@ describe('atomic media styles', () => {
     });
     const sheet = getBreakpointSheet([token]);
     const width100 = sheet.match(
-      /\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{width:100%\}/,
+      /\.b-[a-z0-9-]+\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{width:100%\}/,
     )?.[0];
     const width47 = [
-      ...sheet.matchAll(/\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{width:47%\}/g),
+      ...sheet.matchAll(
+        /\.b-[a-z0-9-]+\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{width:47%\}/g,
+      ),
     ].map((match) => match[0]);
     expect(width100).toBeDefined();
     expect(new Set(width47).size).toBe(2);
@@ -45,10 +47,14 @@ describe('atomic media styles', () => {
     });
     const sheet = getBreakpointSheet([first, second]);
     const flex = [
-      ...sheet.matchAll(/\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{display:flex\}/g),
+      ...sheet.matchAll(
+        /\.b-[a-z0-9-]+\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{display:flex\}/g,
+      ),
     ].map((match) => match[0]);
     const none = [
-      ...sheet.matchAll(/\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{display:none\}/g),
+      ...sheet.matchAll(
+        /\.b-[a-z0-9-]+\.b-[a-z0-9-]+\.b-[a-z0-9-]+\{display:none\}/g,
+      ),
     ].map((match) => match[0]);
     expect(new Set(flex).size).toBe(2);
     expect(new Set(none).size).toBe(2);
@@ -118,9 +124,15 @@ describe('atomic media styles', () => {
 
   it('accepts text metrics on TextStyle', () => {
     const title = breakpoints<TextStyle>({
-      base: {fontSize: 32, fontWeight: '700', lineHeight: 36.8},
+      base: {
+        fontSize: 32,
+        fontWeight: '700',
+        lineHeight: 36.8,
+        letterSpacing: -0.5,
+      },
     });
     expect(classMap(title.style).$$css).toBe(true);
+    expect(getBreakpointSheet([title])).toContain('letter-spacing:-0.5px');
   });
 });
 

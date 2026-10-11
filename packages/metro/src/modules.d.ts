@@ -10,3 +10,9 @@ declare module 'react-native-web/dist/exports/StyleSheet' {
   const StyleSheet: {getSheet(): {id: string; textContent: string}};
   export default StyleSheet;
 }
+declare module '@react-native-media-styles/metro/original-ordered-sheet' {
+  export default function createOrderedSheet(sheet: unknown): {
+    insert(css: string, group: number): void;
+    getTextContent(): string;
+  };
+}

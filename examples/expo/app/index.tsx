@@ -53,16 +53,13 @@ export default function Home() {
           brings its own responsive CSS.
         </Text>
         <View style={styles.actions}>
-          <Link
-            href="/details"
-            testID="details-link"
-            style={[
-              styles.button,
-              styles.primaryButton,
-              styles.primaryButtonText,
-            ]}
-          >
-            Open details →
+          <Link href="/details" asChild>
+            <Pressable
+              testID="details-link"
+              style={StyleSheet.flatten([styles.button, styles.primaryButton])}
+            >
+              <Text style={styles.primaryButtonText}>Open details →</Text>
+            </Pressable>
           </Link>
           <Pressable
             testID="counter"
@@ -81,6 +78,9 @@ export default function Home() {
             </Text>
           </Pressable>
         </View>
+        <Link href="/compatibility" testID="compatibility-link">
+          Compatibility checks
+        </Link>
       </View>
       <View testID="responsive-grid" style={useBreakpointStyle(grid)}>
         <ResponsiveCard

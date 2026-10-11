@@ -2,7 +2,11 @@ import type {ImageStyle, StyleProp, TextStyle, ViewStyle} from 'react-native';
 
 export type MediaStyle = ViewStyle | TextStyle | ImageStyle;
 
-/** Properties supported by the scalar CSS serializer and native normalization. */
+/**
+ * Restrict RN styles to properties handled by our scalar CSS serializer and
+ * native normalization. Full RN types also allow structured values such as
+ * transform arrays, which require property-specific CSS conversion.
+ */
 type SupportedStyleProperty =
   | 'margin'
   | 'marginHorizontal'
@@ -45,6 +49,7 @@ type SupportedStyleProperty =
   | 'justifyContent'
   | 'fontSize'
   | 'lineHeight'
+  | 'letterSpacing'
   | 'fontWeight'
   | 'position'
   | 'aspectRatio'

@@ -24,7 +24,7 @@ export default function StreamCard() {
 }
 
 const styles = StyleSheet.create({
-  panel: {backgroundColor: '#dce9df', borderRadius: 12},
+  panel: {backgroundColor: '#dce9df', borderRadius: 12, paddingLeft: 93},
   label: {fontSize: 10, letterSpacing: 1.6, color: '#37684e'},
   title: {fontSize: 27, fontWeight: '700', color: '#173c2e'},
   body: {fontSize: 15, lineHeight: 24, color: '#3a6250', maxWidth: 680},

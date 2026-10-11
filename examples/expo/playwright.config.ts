@@ -7,6 +7,12 @@ export default defineConfig({
   use: {browserName: 'chromium', headless: true},
   webServer: [
     {
+      command: 'node scripts/expo.mts server start --web --port 8097 --offline',
+      url: 'http://localhost:8097/health',
+      reuseExistingServer: false,
+      timeout: 180000,
+    },
+    {
       command: 'node scripts/expo.mts server serve dist-server --port 8091',
       // The API healthcheck does not render a page or warm its RNW styles.
       url: 'http://localhost:8091/health',

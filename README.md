@@ -15,7 +15,7 @@ Install core in your React Native app. For the Expo/Metro web integration, insta
 pnpm add @react-native-media-styles/core @react-native-media-styles/metro
 ```
 
-The web integration requires React 19 and React Native Web 0.21. Expo Router on SDK 57 is the tested setup. Native-only apps can use core without the Metro adapter.
+The web integration requires React 19 and React Native Web 0.21. The Expo demo verifies Expo Router on SDK 57. Native-only apps can use core without the Metro adapter.
 
 ## Define responsive styles
 
@@ -108,6 +108,10 @@ pnpm test
 pnpm typecheck
 pnpm lint
 pnpm test:package
+pnpm test:install
+pnpm benchmark:css
 ```
 
 Root commands check the packages and demo tooling. To run a core command directly, use `pnpm --filter @react-native-media-styles/core <command>`.
+
+The release-check workflow also builds SSR, SPA and static exports, runs Chromium integration tests and uploads benchmark output. `test:install` packs and installs the packages in a temporary directory outside the workspace, then verifies Babel, web bundling, SSR resources and Metro resolution.
