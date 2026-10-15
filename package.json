@@ -3,8 +3,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "test": "pnpm --filter \"@react-native-media-styles/*\" test && node --test examples/expo/scripts/android.test.mts examples/expo/scripts/dependency-patches.test.mts",
-    "typecheck": "tsc -p scripts/tsconfig.json && pnpm --filter \"@react-native-media-styles/*\" typecheck && pnpm --dir examples/expo typecheck",
+    "test": "pnpm --filter \"@react-native-media-styles/*\" --filter react-native-web-streaming-styles test && node --test examples/expo/scripts/android.test.mts examples/expo/scripts/dependency-patches.test.mts",
+    "typecheck": "tsc -p scripts/tsconfig.json && pnpm --filter \"@react-native-media-styles/*\" --filter react-native-web-streaming-styles typecheck && pnpm --dir examples/expo typecheck",
     "lint": "oxlint",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",

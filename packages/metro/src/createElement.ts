@@ -1,13 +1,24 @@
 import {
+  Children,
   createElement,
+  cloneElement,
   Fragment,
   isValidElement,
   type ReactElement,
+  type ReactNode,
 } from 'react';
 import originalCreateElement from 'react-native-web-streaming-styles/original-create-element';
 import {registry} from './registry';
 
 const elements = new WeakMap<object, ReturnType<typeof createElement>>();
+
+type ContainerProps = {
+  children?: ReactNode;
+  dangerouslySetInnerHTML?: unknown;
+};
+
+const leafHost =
+  /^(area|base|br|col|embed|hr|img|input|link|meta|option|param|script|source|style|textarea|title|track|wbr)$/;
 
 export function elementClassName(element: ReactElement): string {
   let node: unknown = element;
@@ -39,11 +50,25 @@ export default function createStyledElement(
     }
     return style;
   });
-  // Keep the host in a stable position when its resource dependencies change.
-  return createElement(
-    Fragment,
-    null,
-    createElement(Fragment, null, styles),
-    element,
-  );
+  // Containers declare resources beside their content, preserving the RNW host
+  // and locale provider while responsive companions surround nested components.
+  function attach(node: ReactElement<ContainerProps>): ReactElement {
+    if (
+      typeof node.type !== 'string' &&
+      isValidElement<ContainerProps>(node.props.children)
+    ) {
+      return cloneElement(node, {children: attach(node.props.children)});
+    }
+    if (
+      typeof node.type !== 'string' ||
+      leafHost.test(node.type) ||
+      node.props.dangerouslySetInnerHTML
+    ) {
+      return createElement(Fragment, null, styles, node);
+    }
+    const content = Children.toArray(node.props.children);
+    // Resources and keyed content each occupy one stable array slot.
+    return cloneElement(node, {children: [styles, content]});
+  }
+  return isValidElement<ContainerProps>(element) ? attach(element) : element;
 }
