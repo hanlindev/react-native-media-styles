@@ -67,8 +67,9 @@ export default function createStyledElement(
       return createElement(Fragment, null, styles, node);
     }
     const content = Children.toArray(node.props.children);
-    // Resources and keyed content each occupy one stable array slot.
-    return cloneElement(node, {children: [styles, content]});
+    // Explicit keys keep content stable as resources change. A flat array keeps
+    // each host from adding another content array to the server render stack.
+    return cloneElement(node, {children: [...styles, ...content]});
   }
   return isValidElement<ContainerProps>(element) ? attach(element) : element;
 }

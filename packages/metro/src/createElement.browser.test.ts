@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import {
   act,
+  cloneElement,
   createElement as h,
   createRef,
   Fragment,
@@ -79,42 +80,63 @@ it('preserves child state when a sibling and stylesheet rules appear', async () 
   }
 });
 
-it('renders and hydrates complete nested content with colocated stylesheet companions', async () => {
-  const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
-  function Layer({children}: {children: ReactNode}) {
-    return h(
-      Fragment,
-      null,
-      h(
-        'style',
-        {href: 'responsive-layer', precedence: 'responsive'},
-        '.layer{width:270px}',
-      ),
-      createStyledElement('div', {className: 'layer', children}),
+it.each([32, 64, 96, 128])(
+  'renders and hydrates complete content through %i nested stylesheet companions',
+  async (layers) => {
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    function Layer({children}: {children: ReactNode}) {
+      return h(
+        Fragment,
+        null,
+        h(
+          'style',
+          {href: 'responsive-layer', precedence: 'responsive'},
+          '.layer{width:270px}',
+        ),
+        createStyledElement('div', {className: 'layer', children}),
+      );
+    }
+    function Metadata({label}: {label: string}) {
+      return createStyledElement('div', {
+        className: 'metadata',
+        children: [
+          createStyledElement('div', {
+            dir: 'rtl',
+            children: label,
+          }),
+          createStyledElement('div', {children: '·'}),
+          createStyledElement('div', {children: '18 replies'}),
+        ].map((node, index) => cloneElement(node, {key: index})),
+      });
+    }
+    let tree: ReactNode = ['DISCUSSION', 'COLLECTION', 'REVIEW'].map((label) =>
+      h(Layer, {
+        key: label,
+        children: h(Metadata, {label}),
+      }),
     );
-  }
-  let tree: ReactNode = ['DISCUSSION', 'COLLECTION', 'REVIEW'].map((label) =>
-    h(Layer, {
-      key: label,
-      children: createStyledElement('div', {dir: 'rtl', children: label}),
-    }),
-  );
-  for (let depth = 0; depth < 32; depth++) tree = h(Layer, {children: tree});
-  const container = document.createElement('div');
-  document.body.append(container);
-  container.innerHTML = renderToString(tree);
-  expect(container.textContent).toContain('DISCUSSIONCOLLECTIONREVIEW');
-  const first = container.querySelector('[dir="rtl"]');
-  const root = hydrateRoot(container, tree);
-  try {
-    await act(async () => {});
-    expect(container.querySelector('[dir="rtl"]')).toBe(first);
-    expect(container.textContent).toContain('DISCUSSIONCOLLECTIONREVIEW');
-    expect(errors).not.toHaveBeenCalled();
-  } finally {
-    await act(async () => root.unmount());
-  }
-});
+    for (let depth = 0; depth < layers; depth++)
+      tree = h(Layer, {children: tree});
+    const container = document.createElement('div');
+    document.body.append(container);
+    container.innerHTML = renderToString(tree);
+    const expected =
+      'DISCUSSION·18 repliesCOLLECTION·18 repliesREVIEW·18 replies';
+    expect(container.textContent).toContain(expected);
+    expect(container.querySelectorAll('.metadata')).toHaveLength(3);
+    const first = container.querySelector('[dir="rtl"]');
+    const root = hydrateRoot(container, tree);
+    try {
+      await act(async () => {});
+      expect(container.querySelector('[dir="rtl"]')).toBe(first);
+      expect(container.textContent).toContain(expected);
+      expect(container.querySelectorAll('.metadata')).toHaveLength(3);
+      expect(errors).not.toHaveBeenCalled();
+    } finally {
+      await act(async () => root.unmount());
+    }
+  },
+);
 
 it.each([
   ['input', {defaultValue: 'Input value'}],
