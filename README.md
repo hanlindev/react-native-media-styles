@@ -7,8 +7,6 @@ Media-query styles for React Native and React Native Web. When rendered on web, 
 - `[@react-native-media-styles/babel-plugin](./packages/babel-plugin/README.md)`: optional plugin that inserts stylesheet companions for the breakpoint hooks.
 - `[Expo Router demo](./examples/expo/README.md)`: a working app that uses all three packages. Private, and not published to npm.
 
-
-
 ## Install
 
 Add core to a React Native app. The RNW setup needs both packages:
@@ -16,8 +14,6 @@ Add core to a React Native app. The RNW setup needs both packages:
 ```sh
 pnpm add @react-native-media-styles/core react-native-web-streaming-styles
 ```
-
-
 
 ## Define responsive styles
 
@@ -50,9 +46,9 @@ export function Card() {
 }
 ```
 
-On web, `BreakpointStyles` companion component writes the token's media-query CSS. 
+On web, `BreakpointStyles` companion component writes the token's media-query CSS.
 
-On native, the hook applies the queries that match, and the companion renders nothing. 
+On native, the hook applies the queries that match, and the companion renders nothing.
 
 If the component is lazy, render the companion inside its Suspense boundary so the CSS arrives with the content.
 
@@ -103,8 +99,6 @@ pnpm demo:spa                       # SPA web: http://localhost:8082
 pnpm --dir examples/expo android     # Android emulator with Expo Go
 ```
 
-
-
 ## Development
 
 ```sh
@@ -115,4 +109,3 @@ pnpm test:package
 pnpm test:install
 pnpm benchmark:css
 ```
-

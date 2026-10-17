@@ -10,7 +10,9 @@ type Resolver = (
 type ResolverConfig = {resolveRequest?: Resolver | null};
 
 /** Preserve the application's resolver, then adapt RNW's DOM element factory. */
-export function withStreamingStyles<T extends {resolver?: object}>(config: T): T {
+export function withStreamingStyles<T extends {resolver?: object}>(
+  config: T,
+): T {
   const resolver: ResolverConfig = config.resolver ?? {};
   const previous = resolver.resolveRequest;
   const resolve: Resolver = (context, name, platform) =>
